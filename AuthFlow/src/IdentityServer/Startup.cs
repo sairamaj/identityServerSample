@@ -25,7 +25,17 @@ namespace IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+			services.AddCors(options =>
+			{
+				// this defines a CORS policy called "default"
+				options.AddPolicy("default", policy =>
+				{
+					policy.WithOrigins("https://localhost:5003")
+						.AllowAnyHeader()
+						.AllowAnyMethod();
+				});
+			});
+			services.AddControllersWithViews();
 
             var builder = services.AddIdentityServer(options =>
             {
@@ -68,9 +78,9 @@ namespace IdentityServer
             }
 
             app.UseStaticFiles();
-
-            app.UseRouting();
-            app.UseIdentityServer();
+			app.UseRouting();
+			app.UseCors("default");
+			app.UseIdentityServer();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
